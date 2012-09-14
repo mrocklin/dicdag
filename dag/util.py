@@ -11,3 +11,6 @@ def memodict(f):
 
 def merge(*args):
     return dict(sum([arg.items() for arg in args], []))
+
+def unique(x):
+    return len(set(x)) == len(x)
