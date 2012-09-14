@@ -80,7 +80,7 @@ def tuple_dag_to_graph(dag, inputs, outputs, ith_output):
         # Compute result of the associated function
         # Get the variables for the inputs recursively
         inputs = map(_build_var, args)
-        return ith_output(fn, inputs, idx)
+        return ith_output(fn, inputs, idx, var)
 
 
     graph_outputs = map(_build_var, outputs)
