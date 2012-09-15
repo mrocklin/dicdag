@@ -36,3 +36,5 @@ def test_unidag_to_dag_small():
 def test_unidag_to_dag_medium():
     assert unidag_to_dag(medium_unidag) == medium_dag
 
+def test_roundtrip():
+    assert unidag_to_dag(dag_to_unidag(medium_dag)) == medium_dag
