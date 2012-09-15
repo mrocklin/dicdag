@@ -7,6 +7,16 @@ def clone(x):
 index = '_index'
 
 def tuple_dag_to_index_dag(tdag):
+    """ Convert a tuple-dag into an index dag
+
+    Inserts index operations for all outputs. As a result each pseudo-job has
+    only one output, either a tuple or a single variable. It is now easy to
+    back-traverse the graph
+
+    Reverses:
+        remove_index_entries
+    """
+
 
     gets = {out:
             {'fn' : index,
@@ -17,7 +27,7 @@ def tuple_dag_to_index_dag(tdag):
     return merge(tdag, gets)
 
 def remove_singleton_indices(dag):
-    """
+    """ Remove unnecessary index operations from a dag
 
     merges two operations that look like this
     {(out,) : {'fn': op,  'args': args}
@@ -25,6 +35,9 @@ def remove_singleton_indices(dag):
     into just one that looks like this
     {out    : {'fn': op,  'args': args}}
     i.e. it unpacks singleton tuples
+
+    Reverses:
+        insert_single_indices
     """
 
     # dict of shortcuts
@@ -44,7 +57,8 @@ def remove_singleton_indices(dag):
 def insert_single_indices(dag):
     """ Add in all index operations from tuples, even singletons
 
-    Reverses remove_singleton_indices
+    Reverses:
+        remove_singleton_indices
     """
 
     return merge(*[
@@ -60,6 +74,28 @@ def remove_index_entries(dag):
 
 
 def tuple_dag_to_graph(dag, inputs, outputs, ith_output):
+    """
+    Convert a tuple-dag to a graph of some form
+
+    inputs:
+        dag - a tuple-dag
+        inputs - a tuple of input variables
+        outputs - a tuple of output varibles
+        ith_output - a function to build a variable in a graph
+                     :: (op, args, idx_of_output, old_var) -> new_output
+    outputs:
+        graph - a newly constructed graph
+
+    ith_output in detail:
+        You need to specify how to build your graph. Specifically you must
+        supply a function which takes an operation and a set of inputs and
+        returns the idx'th output of this computation.
+
+        See theano.theano_dag.tuple_dag_to_fgraph.ith_output for an example
+
+    See Also:
+        theano.theano_dag.tuple_dag_to_fgraph
+    """
     input_set = {}
 
     def is_input(var):
