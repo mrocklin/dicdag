@@ -1,4 +1,4 @@
-from unidag import *
+from dag.unidag import *
 
 small_dag = {'b': {'fn': 1, 'args': ('a', )}}
 small_back_unidag = {(('a', ), 1, 'b'): ()}
