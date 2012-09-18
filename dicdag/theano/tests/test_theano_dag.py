@@ -1,8 +1,7 @@
-from dag.theano import *
-from dag.theano.theano_dag import fgraph_to_tuple_dag
-from dag.util import unique
+from dicdag.theano import *
+from dicdag.theano.theano_dag import fgraph_to_tuple_dag
+from dicdag.util import unique
 import theano
-
 
 def info(var):
     return var.name, var.dtype, var.broadcastable, var.type

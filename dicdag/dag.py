@@ -1,6 +1,5 @@
 from util import merge, memodict
 
-
 def clone(x):
     return x
 

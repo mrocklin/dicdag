@@ -1,4 +1,4 @@
-from dag import *
+from dicdag.dag import *
 
 tuple_dag = {('a',)    : {'fn': 1, 'args': ('b', 'c')},
              ('b', 'c'): {'fn': 2, 'args': ()}}

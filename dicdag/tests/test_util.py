@@ -1,4 +1,4 @@
-from dag.util import *
+from dicdag.util import *
 
 def test_merge():
     d = {1:2, 3:4}

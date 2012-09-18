@@ -3,9 +3,9 @@ from theano.gof.utils import give_variables_names
 
 def clone(x):
     return x.clone()
-import dag
-dag.clone = clone
-from dag import *
+import dicdag
+dicdag.clone = clone
+from dicdag import *
 
 # Composite functions
 def fgraph_to_dag(fgraph):
