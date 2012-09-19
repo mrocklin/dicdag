@@ -40,3 +40,7 @@ def test_remove_singleton_indices2():
         'a': {'fn': 'stuff', 'args': (1,2,3)},
         'b': {'fn': 'blah',  'args': ()}}
 
+def test_inputs_of():
+    assert  inputs_of(tuple_dag) == {'b', 'c'}
+def test_outputs_of():
+    assert outputs_of(tuple_dag) == {'a'}

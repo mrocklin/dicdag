@@ -127,3 +127,15 @@ def dag_to_graph(dag, inputs, outputs, ith_output):
     tdag = remove_index_entries(insert_single_indices(dag))
     return tuple_dag_to_graph(tdag, inputs, outputs, ith_output)
 
+def inputs_of(tdag):
+    return {i for k,v in tdag.items() for i in k if v['args'] == ()}
+
+def outputs_of(tdag):
+    """
+    Return the variables produced in dag that are not produced or not used
+
+    input:
+        tuple-dag
+    """
+    args  = {v for val in tdag.values() for v in val['args']}
+    return  {o for os in tdag for o in os if o not in args}
