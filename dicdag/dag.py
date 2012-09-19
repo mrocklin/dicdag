@@ -122,3 +122,8 @@ def tuple_dag_to_graph(dag, inputs, outputs, ith_output):
     graph_inputs  = map(input_set.__getitem__, map(str, inputs))
 
     return graph_inputs, graph_outputs
+
+def dag_to_graph(dag, inputs, outputs, ith_output):
+    tdag = remove_index_entries(insert_single_indices(dag))
+    return tuple_dag_to_graph(tdag, inputs, outputs, ith_output)
+
