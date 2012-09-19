@@ -88,12 +88,17 @@ def fgraph_to_tuple_dag(fgraph):
     dag = {tuple(map(newvars.__getitem__, node.outputs)):
             {'fn'  : node.op,
              'args': tuple(map(newvars.__getitem__, node.inputs))}
-             for node in fgraph.nodes}
+             for node in fgraph.apply_nodes}
 
     inputs  = tuple(map(newvars.__getitem__, fgraph.inputs))
     outputs = tuple(map(newvars.__getitem__, fgraph.outputs))
 
     return dag, inputs, outputs
+
+def ith_output(fn, inputs, idx, old_var):
+    new_var = fn.make_node(*inputs).outputs[idx]
+    new_var.name = old_var.name
+    return new_var
 
 def tuple_dag_to_fgraph(dag, inputs, outputs):
     """ Converts a tuple-dag into a theano.FunctionGraph
@@ -107,9 +112,5 @@ def tuple_dag_to_fgraph(dag, inputs, outputs):
     This format is used when some functions create multiple outputs.
     It can be converted or simplified with functions in the root dag library.
     """
-    def ith_output(fn, inputs, idx, old_var):
-        new_var = fn.make_node(*inputs).outputs[idx]
-        new_var.name = old_var.name
-        return new_var
 
     return FunctionGraph(*tuple_dag_to_graph(dag, inputs, outputs, ith_output))
