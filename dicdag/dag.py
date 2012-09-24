@@ -128,7 +128,9 @@ def dag_to_graph(dag, inputs, outputs, ith_output):
     return tuple_dag_to_graph(tdag, inputs, outputs, ith_output)
 
 def inputs_of(tdag):
-    return {i for k,v in tdag.items() for i in k if v['args'] == ()}
+    args  = {v for val in tdag.values() for v in val['args']}
+    outs  = {v for key in tdag.keys() for v in key}
+    return  {i for i in args if i not in outs}
 
 def outputs_of(tdag):
     """
