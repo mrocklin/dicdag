@@ -1,16 +1,21 @@
 from dicdag.dag import *
 
 tuple_dag = {('a',)    : {'fn': 1, 'args': ('b', 'c')},
-             ('b', 'c'): {'fn': 2, 'args': ()}}
+             ('b', 'd'): {'fn': 2, 'args': ('e',)},
+             ('f', )   : {'fn': 3, 'args': ('d', 'a')}}
+
 index_dag = {('a',)    : {'fn': 1, 'args': ('b', 'c')},
-             ('b', 'c'): {'fn': 2, 'args': ()},
              'a'       : {'fn': index, 'args': (('a',), 0)},
-             'b'       : {'fn': index, 'args': (('b', 'c'), 0)},
-             'c'       : {'fn': index, 'args': (('b', 'c'), 1)}}
+             'b'       : {'fn': index, 'args': (('b', 'd'), 0)},
+             'd'       : {'fn': index, 'args': (('b', 'd'), 1)},
+             ('b', 'd'): {'fn': 2, 'args': ('e',)},
+             ('f',)    : {'fn': 3, 'args': ('d', 'a')},
+             'f'       : {'fn': index, 'args': (('f',), 0)}}
 redin_dag = {'a'       : {'fn': 1, 'args': ('b', 'c')},
-             ('b', 'c'): {'fn': 2, 'args': ()},
-             'b'       : {'fn': index, 'args': (('b', 'c'), 0)},
-             'c'       : {'fn': index, 'args': (('b', 'c'), 1)}}
+             'b'       : {'fn': index, 'args': (('b', 'd'), 0)},
+             'd'       : {'fn': index, 'args': (('b', 'd'), 1)},
+             ('b', 'd'): {'fn': 2, 'args': ('e',)},
+             'f'       : {'fn': 3, 'args': ('d', 'a')}}
 
 def test_tuple_dag_to_index_dag():
     assert tuple_dag_to_index_dag(tuple_dag) == index_dag
@@ -44,6 +49,6 @@ def test_remove_singleton_indices2():
         'b': {'fn': 'blah',  'args': ()}}
 
 def test_inputs_of():
-    assert  inputs_of(tuple_dag) == {'b', 'c'}
+    assert  inputs_of(tuple_dag) == {'c', 'e'}
 def test_outputs_of():
-    assert outputs_of(tuple_dag) == {'a'}
+    assert outputs_of(tuple_dag) == {'f'}
