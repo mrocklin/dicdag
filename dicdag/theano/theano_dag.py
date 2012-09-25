@@ -1,5 +1,6 @@
-from theano import FunctionGraph
+import theano
 from theano.gof.utils import give_variables_names
+
 
 def clone(x):
     return x.clone()
@@ -8,11 +9,11 @@ dicdag.clone = clone
 from dicdag import *
 
 # Composite functions
-def fgraph_to_dag(fgraph):
+def theano_graph_to_dag(i, o):
     """ Converts a theano.FunctionGraph to a dict dag
 
     inputs:
-        fgraph - a theano.FunctionGraph
+        i, o    - a theano graph described by input and output variables
     outputs:
         dag     - a dict of the form
                 - {var1: {'fn': fn, 'args': arguments}, ... }
@@ -20,20 +21,19 @@ def fgraph_to_dag(fgraph):
         outputs - tuple of outputs of the computation
 
     >>> import theano
-    >>> from dag.theano import fgraph_to_dag
+    >>> from dag.theano import theano_graph_to_dag
     >>> x = theano.tensor.matrix('x')
     >>> y = theano.tensor.dot(x, x); y.name = 'y'
-    >>> fgraph = theano.FunctionGraph((x,), (y,))
-    >>> dag, inputs, outputs = fgraph_to_dag(fgraph)
+    >>> dag, inputs, outputs = theano_graph_to_dag((x,), (y,))
     >>> dag
     {y: {'args': (x, x), 'fn': <theano.tensor.basic.Dot at 0x3800350>}}
     >>> inputs, outputs
     ((x,), (y,))
 
     # reverse
-    >>> fgraph2 = dag_to_fgraph(dag, inputs, outputs)
+    >>> i, o = dag_to_theano_graph(dag, inputs, outputs)
     """
-    tdag, inputs, outputs = fgraph_to_tuple_dag(fgraph)
+    tdag, inputs, outputs = theano_graph_to_tuple_dag(i, o)
     dag = remove_singleton_indices(tuple_dag_to_index_dag(tdag))
     return dag, inputs, outputs
 
@@ -50,25 +50,24 @@ def dag_to_theano_graph(dag, inputs, outputs):
         outputs - tuple of theano variables
 
     >>> import theano
-    >>> from dag.theano import fgraph_to_dag
+    >>> from dag.theano import theano_graph_to_dag
     >>> x = theano.tensor.matrix('x')
     >>> y = theano.tensor.dot(x, x); y.name = 'y'
-    >>> fgraph = theano.FunctionGraph((x,), (y,))
-    >>> dag, inputs, outputs = fgraph_to_dag(fgraph)
+    >>> dag, inputs, outputs = theano_graph_to_dag((x,), (y,))
     >>> dag
     {y: {'args': (x, x), 'fn': <theano.tensor.basic.Dot at 0x3800350>}}
     >>> inputs, outputs
     ((x,), (y,))
 
     # reverse
-    >>> fgraph2 = dag_to_theano_graph(dag, inputs, outputs)
+    >>> i, o = dag_to_theano_graph(dag, inputs, outputs)
     """
 
     tdag = dag_to_tdag(dag)
     return tuple_dag_to_theano_graph(tdag, inputs, outputs)
 
 
-def fgraph_to_tuple_dag(fgraph):
+def theano_graph_to_tuple_dag(i, o):
     """ Converts a theano.FunctionGraph into a tuple-dag
 
     This dag is of the form
@@ -80,19 +79,21 @@ def fgraph_to_tuple_dag(fgraph):
     This format is used when some functions create multiple outputs.
     It can be converted or simplified with functions in the root dag library.
     """
-    fgraph = fgraph.clone()
-    give_variables_names(fgraph.variables)
+    i, o = theano.gof.graph.clone(i, o)
+    variables = theano.gof.graph.variables(i, o)
+    apply_nodes = theano.gof.graph.list_of_nodes(i, o)
+    give_variables_names(variables)
 
-    newvars = {var: clone(var) for var in fgraph.variables}
+    newvars = {var: clone(var) for var in variables}
 
     # Produces dag with inputs and outputs as tuples
     dag = {tuple(map(newvars.__getitem__, node.outputs)):
             {'fn'  : node.op,
              'args': tuple(map(newvars.__getitem__, node.inputs))}
-             for node in fgraph.apply_nodes}
+             for node in apply_nodes}
 
-    inputs  = tuple(map(newvars.__getitem__, fgraph.inputs))
-    outputs = tuple(map(newvars.__getitem__, fgraph.outputs))
+    inputs  = tuple(map(newvars.__getitem__, i))
+    outputs = tuple(map(newvars.__getitem__, o))
 
     return dag, inputs, outputs
 

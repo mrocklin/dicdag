@@ -90,10 +90,10 @@ def tuple_dag_to_graph(dag, inputs, outputs, ith_output):
         supply a function which takes an operation and a set of inputs and
         returns the idx'th output of this computation.
 
-        See theano.theano_dag.tuple_dag_to_fgraph.ith_output for an example
+        See theano.theano_dag.ith_output for an example
 
     See Also:
-        theano.theano_dag.tuple_dag_to_fgraph
+        theano.theano_dag.tuple_dag_to_theano_graph
     """
     input_set = {}
 
