@@ -37,7 +37,7 @@ def fgraph_to_dag(fgraph):
     dag = remove_singleton_indices(tuple_dag_to_index_dag(tdag))
     return dag, inputs, outputs
 
-def dag_to_fgraph(dag, inputs, outputs):
+def dag_to_theano_graph(dag, inputs, outputs):
     """ Converts a dicdag into a theano.FunctionGraph
 
     inputs:
@@ -46,7 +46,8 @@ def dag_to_fgraph(dag, inputs, outputs):
         inputs  - tuple of inputs to the computation
         outputs - tuple of outputs of the computation
     outputs:
-        fgraph - a theano.FunctionGraph
+        inputs  - tuple of theano variables
+        outputs - tuple of theano variables
 
     >>> import theano
     >>> from dag.theano import fgraph_to_dag
@@ -60,11 +61,11 @@ def dag_to_fgraph(dag, inputs, outputs):
     ((x,), (y,))
 
     # reverse
-    >>> fgraph2 = dag_to_fgraph(dag, inputs, outputs)
+    >>> fgraph2 = dag_to_theano_graph(dag, inputs, outputs)
     """
 
-    tdag = remove_index_entries(insert_single_indices(dag))
-    return tuple_dag_to_fgraph(tdag, inputs, outputs)
+    tdag = dag_to_tdag(dag)
+    return tuple_dag_to_theano_graph(tdag, inputs, outputs)
 
 
 def fgraph_to_tuple_dag(fgraph):
@@ -100,8 +101,8 @@ def ith_output(fn, inputs, idx, old_var):
     new_var.name = old_var.name
     return new_var
 
-def tuple_dag_to_fgraph(dag, inputs, outputs):
-    """ Converts a tuple-dag into a theano.FunctionGraph
+def tuple_dag_to_theano_graph(dag, inputs, outputs):
+    """ Converts a tuple-dag into a theano graph
 
     This dag is of the form
 
@@ -113,4 +114,4 @@ def tuple_dag_to_fgraph(dag, inputs, outputs):
     It can be converted or simplified with functions in the root dag library.
     """
 
-    return FunctionGraph(*tuple_dag_to_graph(dag, inputs, outputs, ith_output))
+    return tuple_dag_to_graph(dag, inputs, outputs, ith_output)

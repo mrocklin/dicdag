@@ -42,7 +42,7 @@ def _test_fgraph_dag_equivalence(fgraph):
                if var.name not in map(str, inputs))
 
 def _test_roundtrip(fgraph):
-    fgraph2 = dag_to_fgraph(*fgraph_to_dag(fgraph))
+    fgraph2 = theano.FunctionGraph(*dag_to_theano_graph(*fgraph_to_dag(fgraph)))
     assert (theano.printing.debugprint(fgraph,  file='str') ==
             theano.printing.debugprint(fgraph2, file='str'))
 
