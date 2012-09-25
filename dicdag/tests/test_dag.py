@@ -24,6 +24,9 @@ def test_insert_single_indices():
 def test_remove_index_entries():
     assert remove_index_entries(index_dag) == tuple_dag
 
+def test_dag_to_tdag():
+    assert dag_to_tdag(redin_dag) == tuple_dag
+
 def test_all():
     assert (remove_index_entries(
                 insert_single_indices(
